@@ -33,6 +33,9 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Routes
+app.get('/', (req, res) => res.json({ message: "Teacher Finder API is running!" }));
+app.get('/api', (req, res) => res.json({ message: "Teacher Finder API is running!" }));
+
 app.use('/api/auth', authRoutes);
 app.use('/api/teacher', teacherRoutes);
 app.use('/api', searchRoutes);
