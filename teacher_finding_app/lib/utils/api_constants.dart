@@ -4,7 +4,7 @@ library;
 
 class ApiConstants {
   // Base URL - Change to your backend server address
-  static const String baseUrl = 'http://localhost:5000';
+  static const String baseUrl = 'https://teacher-finding-app.vercel.app';
 
   // ZEGOCLOUD Configuration
   static const int zegoAppId = 2009635202;
