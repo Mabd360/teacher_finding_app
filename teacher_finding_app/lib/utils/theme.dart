@@ -7,18 +7,22 @@ class AppTheme {
   // COLOR SYSTEM - Modern, Professional Palette
   // ============================================================================
 
-  // Primary Colors
-  static const Color primaryDark = Color(0xFF4F46E5); // Deep Indigo
-  static const Color primary = Color(0xFF6366F1); // Indigo
-  static const Color primaryLight = Color(0xFF818CF8); // Light Indigo
+  // Primary Colors (Neon Glow System)
+  static const Color primaryDark = Color(0xFF7E22CE); // Dark Neon Purple
+  static const Color primary = Color(0xFFA855F7); // Neon Purple
+  static const Color primaryLight = Color(0xFFC084FC); // Light Neon Purple
 
   // Secondary Colors
-  static const Color secondary = Color(0xFF06B6D4); // Cyan
-  static const Color secondaryLight = Color(0xFF22D3EE); // Light Cyan
+  static const Color secondary = Color(0xFF06B6D4); // Neon Cyan
+  static const Color secondaryLight = Color(0xFF22D3EE); // Light Neon Cyan
 
   // Accent Colors
-  static const Color accent = Color(0xFF9333EA); // Purple
-  static const Color accentLight = Color(0xFFA855F7); // Light Purple
+  static const Color accent = Color(0xFFEC4899); // Neon Pink
+  static const Color accentLight = Color(0xFFF472B6); // Light Neon Pink
+
+  // Neon Extra Colors
+  static const Color neonAmber = Color(0xFFF59E0B); // Neon Amber
+  static const Color neonRose = Color(0xFFF43F5E); // Neon Rose/Red
 
   // Status Colors
   static const Color success = Color(0xFF10B981); // Emerald
@@ -35,11 +39,11 @@ class AppTheme {
   static const Color textGrayLight = Color(0xFF6B7280); // Gray text
   static const Color textMutedLight = Color(0xFF9CA3AF); // Muted text
 
-  // Neutral Colors - Dark Mode
-  static const Color bgDark = Color(0xFF0F172A); // Almost black
-  static const Color surfaceDark = Color(0xFF1E293B); // Dark surface
-  static const Color cardDark = Color(0xFF334155); // Dark card
-  static const Color borderDark = Color(0xFF475569); // Dark border
+  // Neutral Colors - Dark Mode (Premium Glassmorphic Dashboard Dark Mode)
+  static const Color bgDark = Color(0xFF0A0B14); // Sleek Dark Premium Background
+  static const Color surfaceDark = Color(0xFF131524); // Slightly lighter dark surface
+  static const Color cardDark = Color(0xFF1B1D30); // Transparent glass background
+  static const Color borderDark = Color(0x1Fffffff); // Very subtle white border for glass highlights
   static const Color textDarkDark = Color(0xFFF1F5F9); // Light text in dark
   static const Color textGrayDark = Color(0xFFCBD5E1); // Gray text in dark
   static const Color textMutedDark = Color(0xFF94A3B8); // Muted text in dark
@@ -90,14 +94,14 @@ class AppTheme {
   // Glow shadows for buttons
   static List<BoxShadow> shadowGlow(Color color) => [
     BoxShadow(
-      color: color.withOpacity(0.3),
+      color: color.withOpacity(0.4),
       blurRadius: 20,
-      offset: const Offset(0, 10),
+      offset: const Offset(0, 8),
     ),
     BoxShadow(
-      color: color.withOpacity(0.15),
+      color: color.withOpacity(0.2),
       blurRadius: 40,
-      offset: const Offset(0, 20),
+      offset: const Offset(0, 16),
     ),
   ];
 
@@ -114,7 +118,7 @@ class AppTheme {
   static const LinearGradient gradientPrimaryToAccent = LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
-    colors: [primaryDark, accent],
+    colors: [primary, accent],
   );
 
   static const LinearGradient gradientDeepToLight = LinearGradient(

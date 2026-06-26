@@ -66,5 +66,9 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<key>NSCameraUsageDescription</key>
+	<string>We require camera access for video classes.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>We require microphone access for student-teacher communication.</string>
 </dict>
 </plist>

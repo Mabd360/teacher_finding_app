@@ -116,302 +116,312 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final showHeader = screenWidth <= 850;
+
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Create Account'),
-        elevation: 0,
-        backgroundColor: Colors.transparent,
-        foregroundColor: Theme.of(context).primaryColor,
-      ),
+      appBar: showHeader
+          ? AppBar(
+              title: const Text('Create Account'),
+              elevation: 0,
+              backgroundColor: Colors.transparent,
+              foregroundColor: Theme.of(context).primaryColor,
+            )
+          : null,
       body: GlowBackground(
-        child: SafeArea(
-          child: FadeInPageTransition(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppTheme.xl,
-                vertical: AppTheme.lg,
-              ),
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    // Header
-                    _buildHeader(context),
-                    const SizedBox(height: AppTheme.xxxl),
+        child: ResponsiveSplitLayout(
+          title: 'Join Teacher Finder',
+          subtitle: 'Create your account and start learning',
+          formChild: SafeArea(
+            child: FadeInPageTransition(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppTheme.xl,
+                  vertical: AppTheme.lg,
+                ),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      if (showHeader) ...[
+                        _buildHeader(context),
+                        const SizedBox(height: AppTheme.xxxl),
+                      ],
 
-                    // Inputs Card
-                    GlassCard(
-                      padding: const EdgeInsets.all(AppTheme.xl),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                      // Inputs Card
+                      GlassCard(
+                        padding: const EdgeInsets.all(AppTheme.xl),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            // Full Name Field
+                            TextFormField(
+                              controller: _nameController,
+                              decoration: const InputDecoration(
+                                labelText: 'Full Name',
+                                prefixIcon: Icon(Icons.person_outlined),
+                                hintText: 'John Doe',
+                              ),
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Please enter your name';
+                                }
+                                if (value.length < 2) {
+                                  return 'Name must be at least 2 characters';
+                                }
+                                return null;
+                              },
+                            ),
+                            const SizedBox(height: AppTheme.lg),
+
+                            // Email Field
+                            TextFormField(
+                              controller: _emailController,
+                              keyboardType: TextInputType.emailAddress,
+                              decoration: const InputDecoration(
+                                labelText: 'Email Address',
+                                prefixIcon: Icon(Icons.email_outlined),
+                                hintText: 'you@example.com',
+                              ),
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Please enter your email';
+                                }
+                                if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
+                                    .hasMatch(value)) {
+                                  return 'Please enter a valid email';
+                                }
+                                return null;
+                              },
+                            ),
+                            const SizedBox(height: AppTheme.lg),
+
+                            // Phone Field
+                            TextFormField(
+                              controller: _phoneController,
+                              keyboardType: TextInputType.phone,
+                              decoration: const InputDecoration(
+                                labelText: 'Phone Number',
+                                prefixIcon: Icon(Icons.phone_outlined),
+                                hintText: '+92 300 1234567',
+                              ),
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Please enter your phone number';
+                                }
+                                if (value.length < 7) {
+                                  return 'Please enter a valid phone number';
+                                }
+                                return null;
+                              },
+                            ),
+                            const SizedBox(height: AppTheme.lg),
+
+                            // Role Selection
+                            _buildRoleSelector(context),
+                            const SizedBox(height: AppTheme.lg),
+
+                            // CNIC Pictures Field
+                            ModernCard(
+                              padding: const EdgeInsets.all(AppTheme.md),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'CNIC Front Verification Picture',
+                                    style: Theme.of(context).textTheme.labelLarge,
+                                  ),
+                                  const SizedBox(height: AppTheme.md),
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: _cnicFrontImage == null
+                                            ? Text(
+                                                'No CNIC Front picture selected',
+                                                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                                      color: Colors.grey,
+                                                    ),
+                                              )
+                                            : Text(
+                                                'Selected: ${_cnicFrontImage!.name}',
+                                                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                                      color: AppTheme.success,
+                                                      fontWeight: FontWeight.bold,
+                                                    ),
+                                              ),
+                                      ),
+                                      ElevatedButton.icon(
+                                        onPressed: () async {
+                                          final XFile? image = await _picker.pickImage(
+                                            source: ImageSource.gallery,
+                                            imageQuality: 50,
+                                          );
+                                          if (image != null) {
+                                            setState(() {
+                                              _cnicFrontImage = image;
+                                            });
+                                          }
+                                        },
+                                        icon: const Icon(Icons.image_outlined),
+                                        label: Text(_cnicFrontImage == null ? 'Browse' : 'Change'),
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: AppTheme.primary.withOpacity(0.1),
+                                          foregroundColor: AppTheme.primary,
+                                          elevation: 0,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: AppTheme.lg),
+                                  Text(
+                                    'CNIC Back Verification Picture',
+                                    style: Theme.of(context).textTheme.labelLarge,
+                                  ),
+                                  const SizedBox(height: AppTheme.md),
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: _cnicBackImage == null
+                                            ? Text(
+                                                'No CNIC Back picture selected',
+                                                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                                      color: Colors.grey,
+                                                    ),
+                                              )
+                                            : Text(
+                                                'Selected: ${_cnicBackImage!.name}',
+                                                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                                      color: AppTheme.success,
+                                                      fontWeight: FontWeight.bold,
+                                                    ),
+                                              ),
+                                      ),
+                                      ElevatedButton.icon(
+                                        onPressed: () async {
+                                          final XFile? image = await _picker.pickImage(
+                                            source: ImageSource.gallery,
+                                            imageQuality: 50,
+                                          );
+                                          if (image != null) {
+                                            setState(() {
+                                              _cnicBackImage = image;
+                                            });
+                                          }
+                                        },
+                                        icon: const Icon(Icons.image_outlined),
+                                        label: Text(_cnicBackImage == null ? 'Browse' : 'Change'),
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: AppTheme.primary.withOpacity(0.1),
+                                          foregroundColor: AppTheme.primary,
+                                          elevation: 0,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(height: AppTheme.lg),
+
+                            // Password Field
+                            TextFormField(
+                              controller: _passwordController,
+                              obscureText: _obscurePassword,
+                              decoration: InputDecoration(
+                                labelText: 'Password',
+                                prefixIcon: const Icon(Icons.lock_outlined),
+                                hintText: '••••••••',
+                                suffixIcon: IconButton(
+                                  icon: Icon(
+                                    _obscurePassword
+                                        ? Icons.visibility_outlined
+                                        : Icons.visibility_off_outlined,
+                                  ),
+                                  onPressed: () {
+                                    setState(() {
+                                      _obscurePassword = !_obscurePassword;
+                                    });
+                                  },
+                                ),
+                              ),
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Please enter a password';
+                                }
+                                if (value.length < 6) {
+                                  return 'Password must be at least 6 characters';
+                                }
+                                return null;
+                              },
+                            ),
+                            const SizedBox(height: AppTheme.lg),
+
+                            // Confirm Password Field
+                            TextFormField(
+                              controller: _confirmPasswordController,
+                              obscureText: _obscureConfirmPassword,
+                              decoration: InputDecoration(
+                                labelText: 'Confirm Password',
+                                prefixIcon: const Icon(Icons.lock_outlined),
+                                hintText: '••••••••',
+                                suffixIcon: IconButton(
+                                  icon: Icon(
+                                    _obscureConfirmPassword
+                                        ? Icons.visibility_outlined
+                                        : Icons.visibility_off_outlined,
+                                  ),
+                                  onPressed: () {
+                                    setState(() {
+                                      _obscureConfirmPassword = !_obscureConfirmPassword;
+                                    });
+                                  },
+                                ),
+                              ),
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Please confirm your password';
+                                }
+                                return null;
+                              },
+                            ),
+                            const SizedBox(height: AppTheme.xl),
+
+                            // Register Button
+                            PrimaryButton(
+                              label: 'Create Account',
+                              onPressed: _register,
+                              isLoading: _isLoading,
+                              isEnabled: !_isLoading,
+                              height: 56,
+                              fullWidth: true,
+                              fontSize: 16,
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: AppTheme.xl),
+
+                      // Sign In Link
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          // Full Name Field
-                          TextFormField(
-                            controller: _nameController,
-                            decoration: const InputDecoration(
-                              labelText: 'Full Name',
-                              prefixIcon: Icon(Icons.person_outlined),
-                              hintText: 'John Doe',
-                            ),
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Please enter your name';
-                              }
-                              if (value.length < 2) {
-                                return 'Name must be at least 2 characters';
-                              }
-                              return null;
+                          Text(
+                            'Already have an account? ',
+                            style: Theme.of(context).textTheme.bodyMedium,
+                          ),
+                          TextPrimaryButton(
+                            label: 'Sign in',
+                            onPressed: () {
+                              Navigator.of(context).pushReplacementNamed('/login');
                             },
-                          ),
-                          const SizedBox(height: AppTheme.lg),
-
-                          // Email Field
-                          TextFormField(
-                            controller: _emailController,
-                            keyboardType: TextInputType.emailAddress,
-                            decoration: const InputDecoration(
-                              labelText: 'Email Address',
-                              prefixIcon: Icon(Icons.email_outlined),
-                              hintText: 'you@example.com',
-                            ),
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Please enter your email';
-                              }
-                              if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
-                                  .hasMatch(value)) {
-                                return 'Please enter a valid email';
-                              }
-                              return null;
-                            },
-                          ),
-                          const SizedBox(height: AppTheme.lg),
-
-                          // Phone Field
-                          TextFormField(
-                            controller: _phoneController,
-                            keyboardType: TextInputType.phone,
-                            decoration: const InputDecoration(
-                              labelText: 'Phone Number',
-                              prefixIcon: Icon(Icons.phone_outlined),
-                              hintText: '+92 300 1234567',
-                            ),
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Please enter your phone number';
-                              }
-                              if (value.length < 7) {
-                                return 'Please enter a valid phone number';
-                              }
-                              return null;
-                            },
-                          ),
-                          const SizedBox(height: AppTheme.lg),
-
-                          // Role Selection
-                          _buildRoleSelector(context),
-                          const SizedBox(height: AppTheme.lg),
-
-                          // CNIC Pictures Field
-                          ModernCard(
-                            padding: const EdgeInsets.all(AppTheme.md),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'CNIC Front Verification Picture',
-                                  style: Theme.of(context).textTheme.labelLarge,
-                                ),
-                                const SizedBox(height: AppTheme.md),
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child: _cnicFrontImage == null
-                                          ? Text(
-                                              'No CNIC Front picture selected',
-                                              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                                    color: Colors.grey,
-                                                  ),
-                                            )
-                                          : Text(
-                                              'Selected: ${_cnicFrontImage!.name}',
-                                              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                                    color: AppTheme.success,
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-                                            ),
-                                    ),
-                                    ElevatedButton.icon(
-                                      onPressed: () async {
-                                        final XFile? image = await _picker.pickImage(
-                                          source: ImageSource.gallery,
-                                          imageQuality: 50,
-                                        );
-                                        if (image != null) {
-                                          setState(() {
-                                            _cnicFrontImage = image;
-                                          });
-                                        }
-                                      },
-                                      icon: const Icon(Icons.image_outlined),
-                                      label: Text(_cnicFrontImage == null ? 'Browse' : 'Change'),
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: AppTheme.primary.withOpacity(0.1),
-                                        foregroundColor: AppTheme.primary,
-                                        elevation: 0,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: AppTheme.lg),
-                                Text(
-                                  'CNIC Back Verification Picture',
-                                  style: Theme.of(context).textTheme.labelLarge,
-                                ),
-                                const SizedBox(height: AppTheme.md),
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child: _cnicBackImage == null
-                                          ? Text(
-                                              'No CNIC Back picture selected',
-                                              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                                    color: Colors.grey,
-                                                  ),
-                                            )
-                                          : Text(
-                                              'Selected: ${_cnicBackImage!.name}',
-                                              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                                    color: AppTheme.success,
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-                                            ),
-                                    ),
-                                    ElevatedButton.icon(
-                                      onPressed: () async {
-                                        final XFile? image = await _picker.pickImage(
-                                          source: ImageSource.gallery,
-                                          imageQuality: 50,
-                                        );
-                                        if (image != null) {
-                                          setState(() {
-                                            _cnicBackImage = image;
-                                          });
-                                        }
-                                      },
-                                      icon: const Icon(Icons.image_outlined),
-                                      label: Text(_cnicBackImage == null ? 'Browse' : 'Change'),
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: AppTheme.primary.withOpacity(0.1),
-                                        foregroundColor: AppTheme.primary,
-                                        elevation: 0,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(height: AppTheme.lg),
-
-                          // Password Field
-                          TextFormField(
-                            controller: _passwordController,
-                            obscureText: _obscurePassword,
-                            decoration: InputDecoration(
-                              labelText: 'Password',
-                              prefixIcon: const Icon(Icons.lock_outlined),
-                              hintText: '••••••••',
-                              suffixIcon: IconButton(
-                                icon: Icon(
-                                  _obscurePassword
-                                      ? Icons.visibility_outlined
-                                      : Icons.visibility_off_outlined,
-                                ),
-                                onPressed: () {
-                                  setState(() {
-                                    _obscurePassword = !_obscurePassword;
-                                  });
-                                },
-                              ),
-                            ),
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Please enter a password';
-                              }
-                              if (value.length < 6) {
-                                return 'Password must be at least 6 characters';
-                              }
-                              return null;
-                            },
-                          ),
-                          const SizedBox(height: AppTheme.lg),
-
-                          // Confirm Password Field
-                          TextFormField(
-                            controller: _confirmPasswordController,
-                            obscureText: _obscureConfirmPassword,
-                            decoration: InputDecoration(
-                              labelText: 'Confirm Password',
-                              prefixIcon: const Icon(Icons.lock_outlined),
-                              hintText: '••••••••',
-                              suffixIcon: IconButton(
-                                icon: Icon(
-                                  _obscureConfirmPassword
-                                      ? Icons.visibility_outlined
-                                      : Icons.visibility_off_outlined,
-                                ),
-                                onPressed: () {
-                                  setState(() {
-                                    _obscureConfirmPassword = !_obscureConfirmPassword;
-                                  });
-                                },
-                              ),
-                            ),
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Please confirm your password';
-                              }
-                              return null;
-                            },
-                          ),
-                          const SizedBox(height: AppTheme.xl),
-
-                          // Register Button
-                          PrimaryButton(
-                            label: 'Create Account',
-                            onPressed: _register,
-                            isLoading: _isLoading,
-                            isEnabled: !_isLoading,
-                            height: 56,
-                            fullWidth: true,
-                            fontSize: 16,
+                            fontSize: 14,
                           ),
                         ],
                       ),
-                    ),
-                    const SizedBox(height: AppTheme.xl),
-
-                    // Sign In Link
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          'Already have an account? ',
-                          style: Theme.of(context).textTheme.bodyMedium,
-                        ),
-                        TextPrimaryButton(
-                          label: 'Sign in',
-                          onPressed: () {
-                            Navigator.of(context).pushReplacementNamed('/login');
-                          },
-                          fontSize: 14,
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: AppTheme.lg),
-                  ],
+                      const SizedBox(height: AppTheme.lg),
+                    ],
+                  ),
                 ),
               ),
             ),

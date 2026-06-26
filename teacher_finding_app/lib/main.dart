@@ -10,6 +10,7 @@ import 'screens/admin_dashboard_screen.dart';
 import 'services/auth_service.dart';
 import 'services/token_storage_service.dart';
 import 'utils/theme.dart';
+import 'components/glass_widgets.dart';
 
 void main() {
   runApp(const TeacherFinderApp());
@@ -24,7 +25,7 @@ class TeacherFinderApp extends StatelessWidget {
       title: 'Teacher Finder',
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
-      themeMode: ThemeMode.light,
+      themeMode: ThemeMode.dark,
       debugShowCheckedModeBanner: false,
       initialRoute: '/',
       routes: {
@@ -113,8 +114,7 @@ class _SplashScreenState extends State<SplashScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+    return GlassScaffold(
       body: Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,

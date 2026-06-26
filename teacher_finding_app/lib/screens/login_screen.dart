@@ -3,7 +3,8 @@ import '../services/auth_service.dart';
 import '../services/token_storage_service.dart';
 import '../models/auth_request_model.dart';
 import '../utils/theme.dart';
-import '../components/index.dart';
+import '../components/index.dart' hide GlassCard;
+import '../components/glass_widgets.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -86,9 +87,14 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: GlowBackground(
-        child: SafeArea(
+    final screenWidth = MediaQuery.of(context).size.width;
+    final showHeader = screenWidth <= 850;
+
+    return GlassScaffold(
+      body: ResponsiveSplitLayout(
+        title: 'Teacher Finder',
+        subtitle: 'Find and connect with qualified teachers',
+        formChild: SafeArea(
           child: FadeInPageTransition(
             child: SingleChildScrollView(
               padding: const EdgeInsets.symmetric(
@@ -99,54 +105,72 @@ class _LoginScreenState extends State<LoginScreen> {
                 key: _formKey,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    // Header
-                    const SizedBox(height: AppTheme.xxxl),
-                    _buildHeader(context),
+                    if (showHeader) ...[
+                      const SizedBox(height: AppTheme.xxxl),
+                      _buildHeader(context),
+                    ],
                     const SizedBox(height: AppTheme.xxxl),
 
                     // Inputs Card
                     GlassCard(
-                      padding: const EdgeInsets.all(AppTheme.xl),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          // Email Field
-                          _buildEmailField(context),
-                          const SizedBox(height: AppTheme.lg),
+                      showNeonBorder: true,
+                      neonBorderGradient: AppTheme.gradientPrimaryToAccent,
+                      child: Padding(
+                        padding: const EdgeInsets.all(AppTheme.xl),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            // Email Field
+                            _buildEmailField(context),
+                            const SizedBox(height: AppTheme.lg),
 
-                          // Password Field
-                          _buildPasswordField(context),
-                          const SizedBox(height: AppTheme.sm),
+                            // Password Field
+                            _buildPasswordField(context),
+                            const SizedBox(height: AppTheme.sm),
 
-                          // Forgot Password Link
-                          Align(
-                            alignment: Alignment.centerRight,
-                            child: TextPrimaryButton(
-                              label: 'Forgot password?',
-                              onPressed: () {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text('Password recovery coming soon'),
-                                  ),
-                                );
-                              },
-                              fontSize: 12,
+                            // Forgot Password Link
+                            Align(
+                              alignment: Alignment.centerRight,
+                              child: TextPrimaryButton(
+                                label: 'Forgot password?',
+                                onPressed: () {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text('Password recovery coming soon'),
+                                    ),
+                                  );
+                                },
+                                fontSize: 12,
+                              ),
                             ),
-                          ),
-                          const SizedBox(height: AppTheme.xl),
+                            const SizedBox(height: AppTheme.xl),
 
-                          // Login Button
-                          PrimaryButton(
-                            label: 'Sign In',
-                            onPressed: _login,
-                            isLoading: _isLoading,
-                            isEnabled: !_isLoading,
-                            height: 56,
-                            fullWidth: true,
-                            fontSize: 16,
-                          ),
-                        ],
+                            // Login Button
+                            NeonButton(
+                              onPressed: _isLoading ? null : _login,
+                              glowColor: AppTheme.primary,
+                              child: _isLoading
+                                  ? const SizedBox(
+                                      width: 24,
+                                      height: 24,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2.5,
+                                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                      ),
+                                    )
+                                  : const Text(
+                                      'Sign In',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 16,
+                                      ),
+                                    ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                     const SizedBox(height: AppTheme.xl),

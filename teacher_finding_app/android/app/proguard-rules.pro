@@ -1,0 +1,2 @@
+-keep class com.zego.** { *; }
+-keep class org.webrtc.** { *; }

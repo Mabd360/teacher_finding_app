@@ -3,7 +3,8 @@ import '../models/user_model.dart';
 import '../services/token_storage_service.dart';
 import '../services/auth_service.dart';
 import '../utils/theme.dart';
-import '../components/index.dart';
+import '../components/index.dart' hide GlassCard;
+import '../components/glass_widgets.dart';
 import 'search_screen.dart';
 import 'student_requests_screen.dart';
 import 'student_bookings_screen.dart';
@@ -420,9 +421,17 @@ class _HomeScreenState extends State<HomeScreen> {
                     icon: Icons.person_outline,
                     label: 'Edit Profile',
                     onTap: () {
-                      setState(() {
-                        _currentIndex = 1;
-                      });
+                      if (_currentUser.isTeacher) {
+                        setState(() {
+                          _currentIndex = 1;
+                        });
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Student profile editing is managed via verification. Basic info editing coming soon!'),
+                          ),
+                        );
+                      }
                     },
                   ),
                   Divider(
@@ -566,7 +575,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return GlassScaffold(
       appBar: AppBar(
         title: const Text('Teacher Finder'),
         elevation: 0,
@@ -575,16 +584,31 @@ class _HomeScreenState extends State<HomeScreen> {
         centerTitle: false,
         foregroundColor: Theme.of(context).primaryColor,
       ),
-      body: _screens[_currentIndex],
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _currentIndex,
-        onTap: (index) {
-          setState(() {
-            _currentIndex = index;
-          });
-        },
-        items: _buildNavItems(),
-        type: BottomNavigationBarType.fixed,
+      body: ResponsiveCenter(
+        maxWidth: 800,
+        child: _screens[_currentIndex],
+      ),
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(
+          border: Border(
+            top: BorderSide(
+              color: Colors.white.withOpacity(0.08),
+              width: 1,
+            ),
+          ),
+        ),
+        child: BottomNavigationBar(
+          backgroundColor: const Color(0x9A0A0B14), // Glass background for navigation bar
+          elevation: 0,
+          currentIndex: _currentIndex,
+          onTap: (index) {
+            setState(() {
+              _currentIndex = index;
+            });
+          },
+          items: _buildNavItems(),
+          type: BottomNavigationBarType.fixed,
+        ),
       ),
     );
   }

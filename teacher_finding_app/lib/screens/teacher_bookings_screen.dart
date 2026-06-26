@@ -4,6 +4,8 @@ import '../services/booking_service.dart';
 import '../services/token_storage_service.dart';
 import '../utils/theme.dart';
 import '../components/index.dart';
+import 'video_conference_screen.dart';
+
 
 class TeacherBookingsScreen extends StatefulWidget {
   const TeacherBookingsScreen({super.key});
@@ -148,9 +150,11 @@ class _TeacherBookingsScreenState extends State<TeacherBookingsScreen> {
         foregroundColor: isDark ? Colors.white : AppTheme.textDarkLight,
       ),
       body: GlowBackground(
-        child: _isLoading
-            ? const Center(child: CircularProgressIndicator())
-            : _errorMessage != null
+        child: ResponsiveCenter(
+          maxWidth: 800,
+          child: _isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : _errorMessage != null
                 ? Center(
                     child: Padding(
                       padding: const EdgeInsets.all(AppTheme.lg),
@@ -291,7 +295,7 @@ class _TeacherBookingsScreenState extends State<TeacherBookingsScreen> {
                                           children: [
                                             Expanded(
                                               child: PrimaryButton(
-                                                onPressed: () => _openJitsiMeet(booking),
+                                                onPressed: () => _joinClass(booking),
                                                 icon: Icons.video_call_outlined,
                                                 label: 'Join Virtual Class',
                                                 backgroundColor: AppTheme.success,
@@ -324,6 +328,7 @@ class _TeacherBookingsScreenState extends State<TeacherBookingsScreen> {
                                               icon: Icons.check,
                                               label: 'Complete',
                                               backgroundColor: AppTheme.success,
+                                              textColor: Colors.white,
                                             ),
                                           ),
                                           const SizedBox(width: AppTheme.md),
@@ -345,48 +350,36 @@ class _TeacherBookingsScreenState extends State<TeacherBookingsScreen> {
                           },
                         ),
                       ),
+        ),
       ),
     );
   }
 
-  void _openJitsiMeet(Booking booking) {
-    final jitsiUrl = 'https://meet.jit.si/TeacherFinder_Room_${booking.id.replaceAll("-", "")}';
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Row(
-          children: [
-            Icon(Icons.video_call_outlined, color: AppTheme.success),
-            SizedBox(width: 8),
-            Text('Virtual Classroom'),
-          ],
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text('Your class session is ready to begin! Click below to enter the secure virtual classroom room on Jitsi Meet.'),
-            const SizedBox(height: AppTheme.md),
-            SelectableText(
-              jitsiUrl,
-              style: const TextStyle(fontWeight: FontWeight.bold, color: AppTheme.primary),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Close')),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(ctx);
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Entering classroom...'), backgroundColor: AppTheme.success),
-              );
-            },
-            style: ElevatedButton.styleFrom(backgroundColor: AppTheme.success),
-            child: const Text('Enter Classroom', style: TextStyle(color: Colors.white)),
+  Future<void> _joinClass(Booking booking) async {
+    final user = await TokenStorageService.getUser();
+    if (user == null) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('User details not found. Please log in again.'),
+            backgroundColor: AppTheme.danger,
           ),
-        ],
-      ),
-    );
+        );
+      }
+      return;
+    }
+
+    if (mounted) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => VideoConferenceScreen(
+            bookingId: booking.id,
+            userId: user.id,
+            userName: user.name,
+          ),
+        ),
+      );
+    }
   }
 }

@@ -6,6 +6,10 @@ class ApiConstants {
   // Base URL - Change to your backend server address
   static const String baseUrl = 'http://localhost:5000';
 
+  // ZEGOCLOUD Configuration
+  static const int zegoAppId = 2009635202;
+  static const String zegoAppSign = '173bc3746e38c8503f6bf5817972c5e9463ac439082c9f65ec4de64c5e03f253';
+
   // Authentication Endpoints
   static const String registerEndpoint = '$baseUrl/api/auth/register';
   static const String loginEndpoint = '$baseUrl/api/auth/login';

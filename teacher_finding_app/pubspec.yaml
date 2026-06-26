@@ -44,6 +44,9 @@ dependencies:
   # Image Picker for CNIC upload
   image_picker: ^1.0.7
 
+  # ZegoCloud Video Conference SDK
+  zego_uikit_prebuilt_video_conference: ^2.8.2
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

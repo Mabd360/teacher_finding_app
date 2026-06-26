@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import '../services/request_service.dart';
 import '../services/token_storage_service.dart';
+import '../services/teacher_api_service.dart';
 import '../utils/theme.dart';
 import '../components/index.dart';
 import 'chat_screen.dart';
+import 'booking_screen.dart';
 
 class StudentRequestsScreen extends StatefulWidget {
   const StudentRequestsScreen({super.key});
@@ -46,6 +48,46 @@ class _StudentRequestsScreenState extends State<StudentRequestsScreen> {
         setState(() {
           _errorMessage = error.toString().replaceAll('Exception: ', '');
         });
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
+  Future<void> _bookSession(RequestItem request) async {
+    if (request.teacherId == null) return;
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final teacherProfile = await TeacherApiService.getTeacherProfile(userId: request.teacherId!);
+      if (mounted) {
+        final booked = await Navigator.of(context).push<bool>(
+          MaterialPageRoute(
+            builder: (context) => BookingScreen(
+              teacher: teacherProfile,
+              requestId: request.id,
+            ),
+          ),
+        );
+        if (booked == true) {
+          _loadRequests();
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to load teacher details: ${e.toString().replaceAll('Exception: ', '')}'),
+            backgroundColor: Colors.red,
+          ),
+        );
       }
     } finally {
       if (mounted) {
@@ -217,6 +259,22 @@ class _StudentRequestsScreenState extends State<StudentRequestsScreen> {
                                         const SizedBox(height: AppTheme.md),
                                         Row(
                                           children: [
+                                            Expanded(
+                                              child: ElevatedButton.icon(
+                                                onPressed: () => _bookSession(request),
+                                                icon: const Icon(Icons.calendar_today_outlined, size: 16),
+                                                label: const Text('Book Session'),
+                                                style: ElevatedButton.styleFrom(
+                                                  backgroundColor: AppTheme.success,
+                                                  foregroundColor: Colors.white,
+                                                  elevation: 0,
+                                                  shape: RoundedRectangleBorder(
+                                                    borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                            const SizedBox(width: AppTheme.md),
                                             Expanded(
                                               child: ElevatedButton.icon(
                                                 onPressed: () {
