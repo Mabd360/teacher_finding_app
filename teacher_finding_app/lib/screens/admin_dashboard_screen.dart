@@ -976,15 +976,21 @@ class _AdminVerificationScreenState extends State<AdminVerificationScreen> {
                     itemCount: _unverifiedUsers.length,
                     itemBuilder: (context, index) {
                       final user = _unverifiedUsers[index];
-                      final cnicFrontUrl = user['cnic_front'] != null
-                          ? (user['cnic_front'].toString().startsWith('data:image/')
-                              ? user['cnic_front'].toString()
-                              : '${ApiConstants.baseUrl}${user['cnic_front']}')
+                      
+                      final String? rawFront = user['cnic_front']?.toString();
+                      final bool isFrontBase64 = rawFront != null && 
+                          !rawFront.startsWith('http') && 
+                          !rawFront.startsWith('/uploads');
+                      final cnicFrontUrl = rawFront != null
+                          ? (isFrontBase64 ? rawFront : '${ApiConstants.baseUrl}$rawFront')
                           : null;
-                      final cnicBackUrl = user['cnic_back'] != null
-                          ? (user['cnic_back'].toString().startsWith('data:image/')
-                              ? user['cnic_back'].toString()
-                              : '${ApiConstants.baseUrl}${user['cnic_back']}')
+                          
+                      final String? rawBack = user['cnic_back']?.toString();
+                      final bool isBackBase64 = rawBack != null && 
+                          !rawBack.startsWith('http') && 
+                          !rawBack.startsWith('/uploads');
+                      final cnicBackUrl = rawBack != null
+                          ? (isBackBase64 ? rawBack : '${ApiConstants.baseUrl}$rawBack')
                           : null;
                       
                       final bool isIncomplete = user['phone'] == null || user['cnic_front'] == null || user['cnic_back'] == null;
@@ -1146,7 +1152,7 @@ class _AdminVerificationScreenState extends State<AdminVerificationScreen> {
                                               ),
                                               child: ClipRRect(
                                                 borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-                                                child: cnicFrontUrl != null && cnicFrontUrl.startsWith('data:image/')
+                                                child: cnicFrontUrl != null && !cnicFrontUrl.startsWith('http') && !cnicFrontUrl.startsWith('/uploads')
                                                     ? Image.memory(
                                                         base64Decode(cnicFrontUrl.split('base64,').last),
                                                         fit: BoxFit.cover,
@@ -1197,7 +1203,7 @@ class _AdminVerificationScreenState extends State<AdminVerificationScreen> {
                                               ),
                                               child: ClipRRect(
                                                 borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-                                                child: cnicBackUrl != null && cnicBackUrl.startsWith('data:image/')
+                                                child: cnicBackUrl != null && !cnicBackUrl.startsWith('http') && !cnicBackUrl.startsWith('/uploads')
                                                     ? Image.memory(
                                                         base64Decode(cnicBackUrl.split('base64,').last),
                                                         fit: BoxFit.cover,
