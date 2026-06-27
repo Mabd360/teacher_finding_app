@@ -977,10 +977,14 @@ class _AdminVerificationScreenState extends State<AdminVerificationScreen> {
                     itemBuilder: (context, index) {
                       final user = _unverifiedUsers[index];
                       final cnicFrontUrl = user['cnic_front'] != null
-                          ? '${ApiConstants.baseUrl}${user['cnic_front']}'
+                          ? (user['cnic_front'].toString().startsWith('data:image/')
+                              ? user['cnic_front'].toString()
+                              : '${ApiConstants.baseUrl}${user['cnic_front']}')
                           : null;
                       final cnicBackUrl = user['cnic_back'] != null
-                          ? '${ApiConstants.baseUrl}${user['cnic_back']}'
+                          ? (user['cnic_back'].toString().startsWith('data:image/')
+                              ? user['cnic_back'].toString()
+                              : '${ApiConstants.baseUrl}${user['cnic_back']}')
                           : null;
                       
                       final bool isIncomplete = user['phone'] == null || user['cnic_front'] == null || user['cnic_back'] == null;
@@ -1142,19 +1146,33 @@ class _AdminVerificationScreenState extends State<AdminVerificationScreen> {
                                               ),
                                               child: ClipRRect(
                                                 borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-                                                child: Image.network(
-                                                  cnicFrontUrl,
-                                                  fit: BoxFit.cover,
-                                                  errorBuilder: (context, error, stackTrace) {
-                                                    return const Center(
-                                                      child: Icon(
-                                                        Icons.broken_image_outlined,
-                                                        size: 36,
-                                                        color: Colors.grey,
+                                                child: cnicFrontUrl != null && cnicFrontUrl.startsWith('data:image/')
+                                                    ? Image.memory(
+                                                        base64Decode(cnicFrontUrl.split('base64,').last),
+                                                        fit: BoxFit.cover,
+                                                        errorBuilder: (context, error, stackTrace) {
+                                                          return const Center(
+                                                            child: Icon(
+                                                              Icons.broken_image_outlined,
+                                                              size: 36,
+                                                              color: Colors.grey,
+                                                            ),
+                                                          );
+                                                        },
+                                                      )
+                                                    : Image.network(
+                                                        cnicFrontUrl ?? '',
+                                                        fit: BoxFit.cover,
+                                                        errorBuilder: (context, error, stackTrace) {
+                                                          return const Center(
+                                                            child: Icon(
+                                                              Icons.broken_image_outlined,
+                                                              size: 36,
+                                                              color: Colors.grey,
+                                                            ),
+                                                          );
+                                                        },
                                                       ),
-                                                    );
-                                                  },
-                                                ),
                                               ),
                                             ),
                                           ],
@@ -1179,19 +1197,33 @@ class _AdminVerificationScreenState extends State<AdminVerificationScreen> {
                                               ),
                                               child: ClipRRect(
                                                 borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-                                                child: Image.network(
-                                                  cnicBackUrl,
-                                                  fit: BoxFit.cover,
-                                                  errorBuilder: (context, error, stackTrace) {
-                                                    return const Center(
-                                                      child: Icon(
-                                                        Icons.broken_image_outlined,
-                                                        size: 36,
-                                                        color: Colors.grey,
+                                                child: cnicBackUrl != null && cnicBackUrl.startsWith('data:image/')
+                                                    ? Image.memory(
+                                                        base64Decode(cnicBackUrl.split('base64,').last),
+                                                        fit: BoxFit.cover,
+                                                        errorBuilder: (context, error, stackTrace) {
+                                                          return const Center(
+                                                            child: Icon(
+                                                              Icons.broken_image_outlined,
+                                                              size: 36,
+                                                              color: Colors.grey,
+                                                            ),
+                                                          );
+                                                        },
+                                                      )
+                                                    : Image.network(
+                                                        cnicBackUrl ?? '',
+                                                        fit: BoxFit.cover,
+                                                        errorBuilder: (context, error, stackTrace) {
+                                                          return const Center(
+                                                            child: Icon(
+                                                              Icons.broken_image_outlined,
+                                                              size: 36,
+                                                              color: Colors.grey,
+                                                            ),
+                                                          );
+                                                        },
                                                       ),
-                                                    );
-                                                  },
-                                                ),
                                               ),
                                             ),
                                           ],
