@@ -8,9 +8,16 @@ const authMiddleware = require('../middleware/authMiddleware');
 const fs = require('fs');
 const path = require('path');
 
-// Helper to save base64 image to file
+// Helper to save base64 image to file or fallback to base64 string in serverless environments
 function saveCnicImage(base64Data) {
   if (!base64Data) return null;
+
+  // In production (Vercel serverless functions), the filesystem is read-only.
+  // We fall back to storing the raw base64 string directly in the database.
+  if (process.env.NODE_ENV === 'production' || !process.env.PORT) {
+    return base64Data;
+  }
+
   // Clean base64 data prefix if present (e.g. data:image/png;base64,)
   const matches = base64Data.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/);
   let imageBuffer;
@@ -29,16 +36,21 @@ function saveCnicImage(base64Data) {
     }
   }
   
-  const uploadDir = path.join(__dirname, '../uploads');
-  if (!fs.existsSync(uploadDir)) {
-    fs.mkdirSync(uploadDir, { recursive: true });
+  try {
+    const uploadDir = path.join(__dirname, '../uploads');
+    if (!fs.existsSync(uploadDir)) {
+      fs.mkdirSync(uploadDir, { recursive: true });
+    }
+    
+    const filename = `cnic_${Date.now()}_${Math.floor(Math.random() * 1000)}.${extension}`;
+    const filePath = path.join(uploadDir, filename);
+    fs.writeFileSync(filePath, imageBuffer);
+    
+    return `/uploads/${filename}`;
+  } catch (err) {
+    console.warn('Fs write failed, falling back to base64 storage:', err.message);
+    return base64Data;
   }
-  
-  const filename = `cnic_${Date.now()}_${Math.floor(Math.random() * 1000)}.${extension}`;
-  const filePath = path.join(uploadDir, filename);
-  fs.writeFileSync(filePath, imageBuffer);
-  
-  return `/uploads/${filename}`;
 }
 
 // POST /api/auth/register - Register a new user
