@@ -23,8 +23,7 @@ function makeRandomIv() {
     return result.join('');
 }
 // Function to determine algorithm based on length of secret key (16, 24 or 32 bytes)
-function getAlgorithm(keyBase64) {
-    var key = Buffer.from(keyBase64);
+function getAlgorithm(key) {
     switch (key.length) {
         case 16:
             return 'aes-128-cbc';
@@ -37,7 +36,8 @@ function getAlgorithm(keyBase64) {
 }
 // AES encryption function using CBC/PKCS5Padding mode
 function aesEncrypt(plainText, key, iv) {
-    var cipher = crypto_1.createCipheriv(getAlgorithm(key), key, iv);
+    var keyBuffer = Buffer.from(key, 'binary');
+    var cipher = crypto_1.createCipheriv(getAlgorithm(keyBuffer), keyBuffer, iv);
     cipher.setAutoPadding(true);
     var encrypted = cipher.update(plainText);
     var final = cipher.final();
