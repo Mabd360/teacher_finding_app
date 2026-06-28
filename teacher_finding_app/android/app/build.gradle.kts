@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.teacher_finding_app"
+    namespace = "com.mabd360.teacher_finder"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -21,7 +21,7 @@ android {
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "com.example.teacher_finding_app"
+        applicationId = "com.mabd360.teacher_finder"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = flutter.minSdkVersion
