@@ -158,6 +158,11 @@ class _VideoConferenceScreenState extends State<VideoConferenceScreen> {
               ZegoMenuBarButtonName.chatButton,
             ],
           ),
+        events: ZegoUIKitPrebuiltVideoConferenceEvents(
+          onError: (error) {
+            print('Zego onError: ${error.code} -> ${error.message}');
+          },
+        ),
       ),
     );
   }

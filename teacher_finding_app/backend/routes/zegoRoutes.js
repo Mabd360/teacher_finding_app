@@ -4,6 +4,9 @@ const { generateToken04 } = require('../utils/zegoServerAssistant');
 const authMiddleware = require('../middleware/authMiddleware');
 
 router.post('/token', authMiddleware, (req, res) => {
+  // Set CORS header for web origin
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  console.log('Zego token request for userId:', req.body.userId);
   try {
     const { userId } = req.body;
     
@@ -25,7 +28,10 @@ router.post('/token', authMiddleware, (req, res) => {
     return res.json({ token });
   } catch (error) {
     console.error('Zego token generation error:', error);
-    return res.status(500).json({ error: 'Failed to generate token' });
+    return res.status(500).json({ 
+      error: 'Failed to generate token', 
+      details: error.message || error 
+    });
   }
 });
 
